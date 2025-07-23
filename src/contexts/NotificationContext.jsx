@@ -15,7 +15,7 @@ const NotificationProvider = ({ children }) => {
 
     setTimeout(() => {
       setNotifications((prev) => prev.filter((notif) => notif.id !== id));
-    }, 5000);
+    }, 5001);
   };
 
   return (

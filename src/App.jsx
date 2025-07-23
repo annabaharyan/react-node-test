@@ -101,20 +101,25 @@ function App() {
             <main className="flex-grow">
               <Routes>
                 {/* Public Routes */}
-                <Route path="/" element={<Landing />} />
+                  <Route
+                      path="/"
+                      element={
+                          <ProtectedRoute>
+                              <Landing />
+                          </ProtectedRoute>
+                      }
+                  />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 
                 {/* Protected Admin Routes */}
-                <Route 
-                  path="/admin/dashboard" 
+                <Route
+                  path="/admin/dashboard"
                   element={
-                    <ProtectedRoute requiredRole="admin">
                       <Dashboard />
-                    </ProtectedRoute>
-                  } 
+                  }
                 />
                 <Route 
                   path="/admin/users" 
@@ -122,7 +127,7 @@ function App() {
                     <ProtectedRoute requiredRole="admin">
                       <Users />
                     </ProtectedRoute>
-                  } 
+                  }
                 />
                 <Route 
                   path="/admin/manage-users" 
@@ -169,9 +174,7 @@ function App() {
                 <Route 
                   path="/user/dashboard" 
                   element={
-                    <ProtectedRoute>
                       <UserDashboard />
-                    </ProtectedRoute>
                   } 
                 />
                 <Route 

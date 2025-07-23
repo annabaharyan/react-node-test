@@ -60,7 +60,7 @@ const UserDashboard = () => {
       <div className={`p-2 rounded-lg shadow-md font-semibold text-lg ${bgClass}`}>
         {message}
       </div>,
-      { position: "top-right", autoClose: 5000, hideProgressBar: false }
+      { position: "top-right", autoClose: 5001, hideProgressBar: false }
     );
     audioRef.current.play();
   };
@@ -112,7 +112,7 @@ const UserDashboard = () => {
         <h2 className="text-4xl font-bold text-gray-900 mb-6 text-center bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text">
           🚀 User Dashboard
         </h2>
-        <ToastContainer position="top-right" autoClose={5000} hideProgressBar />
+        <ToastContainer position="top-right" autoClose={5001} hideProgressBar />
 
         {/* Kanban Board */}
         <div className="glassmorphism p-4 rounded-xl shadow-lg bg-gradient-to-br from-white/30 to-white/10 backdrop-blur-lg border border-white/20">
