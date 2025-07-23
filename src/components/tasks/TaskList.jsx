@@ -26,6 +26,8 @@ const TaskList = () => {
   const [error, setError] = useState(null);
   const [editingTask, setEditingTask] = useState(null);
   const [editForm, setEditForm] = useState({ title: '', description: '' });
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
   /**
    * Load tasks from localStorage or initialize with mock data
@@ -125,6 +127,27 @@ const TaskList = () => {
       window.removeEventListener('storage', handleStorageChange);
     };
   }, []);
+
+  useEffect(() => {
+    let updatedTasks = [...tasks];
+
+    // Filter by completion status
+    if (statusFilter !== 'all') {
+      updatedTasks = updatedTasks.filter(
+          (task) => task.status === statusFilter
+      );
+    }
+
+    // Filter by title search
+    if (searchQuery.trim() !== '') {
+      updatedTasks = updatedTasks.filter((task) =>
+          task.title.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    setFilteredTasks(updatedTasks);
+  }, [tasks, statusFilter, searchQuery]);
+
 
   /**
    * Toggle task completion status
@@ -307,130 +330,154 @@ const TaskList = () => {
   }
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow max-h-96 overflow-y-auto">
-      <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">Your Tasks</h3>
-      
-      <ul className="space-y-3" aria-label="Task list">
-        {filteredTasks.map((task) => (
-          <li key={task._id} className="border-b pb-3">
-            {editingTask === task._id ? (
-              // Edit form
-              <div className="space-y-2">
-                <label htmlFor={`title-${task._id}`} className="sr-only">Task title</label>
-                <input
-                  id={`title-${task._id}`}
-                  type="text"
-                  name="title"
-                  value={editForm.title}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                  placeholder="Task title"
-                />
-                
-                <label htmlFor={`description-${task._id}`} className="sr-only">Task description</label>
-                <textarea
-                  id={`description-${task._id}`}
-                  name="description"
-                  value={editForm.description}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                  placeholder="Task description"
-                  rows="2"
-                ></textarea>
-                
-                <div className="flex justify-end space-x-2">
-                  <button
-                    onClick={() => cancelEditing()}
-                    className="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
-                    aria-label="Cancel editing"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={() => saveTask(task._id)}
-                    className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                    aria-label="Save task"
-                  >
-                    Save
-                  </button>
-                </div>
-              </div>
-            ) : (
-              // Task display
-              <div>
-                <div className="flex justify-between items-start">
-                  <h4 className={`font-medium ${task.status === 'complete' ? 'line-through text-gray-500' : 'text-gray-800'}`}>
-                    {task.title}
-                  </h4>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => handleStatusChange(task._id)}
-                      className={`p-1 rounded ${
-                        task.status === 'complete' 
-                          ? 'bg-green-100 text-green-600' 
-                          : 'bg-gray-100 text-gray-600'
-                      } hover:opacity-80 transition-opacity`}
-                      title={task.status === 'complete' ? 'Mark as incomplete' : 'Mark as complete'}
-                      aria-label={task.status === 'complete' ? 'Mark as incomplete' : 'Mark as complete'}
+      <div className="bg-white p-4 rounded-lg shadow max-h-96 overflow-y-auto">
+        <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">Your Tasks</h3>
+        <div className="flex flex-wrap justify-between items-center mb-4 gap-2">
+          {/* Filter Dropdown */}
+          <select
+              className="p-2 border border-gray-300 rounded text-sm text-gray-800 bg-white"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              aria-label="Filter by status"
+          >
+            <option value="all">All Tasks</option>
+            <option value="complete">Completed</option>
+            <option value="incomplete">Incomplete</option>
+          </select>
+
+          {/* Search Input */}
+          <input
+              type="text"
+              placeholder="Search by title..."
+              className="p-2 border border-gray-300 rounded text-sm text-gray-800 bg-white"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              aria-label="Search by title"
+          />
+        </div>
+
+
+        <ul className="space-y-3" aria-label="Task list">
+          {filteredTasks.map((task) => (
+              <li key={task._id} className="border-b pb-3">
+                {editingTask === task._id ? (
+                    // Edit form
+                    <div className="space-y-2">
+                      <label htmlFor={`title-${task._id}`} className="sr-only">Task title</label>
+                      <input
+                          id={`title-${task._id}`}
+                          type="text"
+                          name="title"
+                          value={editForm.title}
+                          onChange={handleInputChange}
+                          className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                          placeholder="Task title"
+                      />
+
+                      <label htmlFor={`description-${task._id}`} className="sr-only">Task description</label>
+                      <textarea
+                          id={`description-${task._id}`}
+                          name="description"
+                          value={editForm.description}
+                          onChange={handleInputChange}
+                          className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                          placeholder="Task description"
+                          rows="2"
+                      ></textarea>
+
+                      <div className="flex justify-end space-x-2">
+                        <button
+                            onClick={() => cancelEditing()}
+                            className="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
+                            aria-label="Cancel editing"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                            onClick={() => saveTask(task._id)}
+                            className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                            aria-label="Save task"
+                        >
+                          Save
+                        </button>
+                      </div>
+                    </div>
+                ) : (
+                    // Task display
+                    <div>
+                      <div className="flex justify-between items-start">
+                        <h4 className={`font-medium ${task.status === 'complete' ? 'line-through text-gray-500' : 'text-gray-800'}`}>
+                          {task.title}
+                        </h4>
+                        <div className="flex space-x-2">
+                          <button
+                              onClick={() => handleStatusChange(task._id)}
+                              className={`p-1 rounded ${
+                                  task.status === 'complete'
+                                      ? 'bg-green-100 text-green-600'
+                                      : 'bg-gray-100 text-gray-600'
+                              } hover:opacity-80 transition-opacity`}
+                              title={task.status === 'complete' ? 'Mark as incomplete' : 'Mark as complete'}
+                              aria-label={task.status === 'complete' ? 'Mark as incomplete' : 'Mark as complete'}
+                          >
+                            <FaCheck aria-hidden="true"/>
+                          </button>
+                          <button
+                              onClick={() => startEditing(task)}
+                              className="p-1 rounded bg-blue-100 text-blue-600 hover:opacity-80 transition-opacity"
+                              title="Edit task"
+                              aria-label="Edit task"
+                          >
+                            <FaEdit aria-hidden="true"/>
+                          </button>
+                        </div>
+                      </div>
+
+                      <p className={`text-sm mt-1 ${task.status === 'complete' ? 'text-gray-400' : 'text-gray-600'}`}>
+                        {task.description}
+                      </p>
+
+                      <div className="mt-2 flex flex-wrap gap-2 justify-between items-center">
+                        <div className="flex flex-wrap gap-2">
+                    <span
+                        className={`text-xs px-2 py-1 rounded flex items-center ${
+                            task.status === 'complete'
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-yellow-100 text-yellow-800'
+                        }`}
+                        aria-label={`Status: ${task.status}`}
                     >
-                      <FaCheck aria-hidden="true" />
-                    </button>
-                    <button
-                      onClick={() => startEditing(task)}
-                      className="p-1 rounded bg-blue-100 text-blue-600 hover:opacity-80 transition-opacity"
-                      title="Edit task"
-                      aria-label="Edit task"
-                    >
-                      <FaEdit aria-hidden="true" />
-                    </button>
-                  </div>
-                </div>
-                
-                <p className={`text-sm mt-1 ${task.status === 'complete' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  {task.description}
-                </p>
-                
-                <div className="mt-2 flex flex-wrap gap-2 justify-between items-center">
-                  <div className="flex flex-wrap gap-2">
-                    <span 
-                      className={`text-xs px-2 py-1 rounded flex items-center ${
-                        task.status === 'complete' 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}
-                      aria-label={`Status: ${task.status}`}
-                    >
-                      <FaCheck className="mr-1" aria-hidden="true" />
+                      <FaCheck className="mr-1" aria-hidden="true"/>
                       {task.status === 'complete' ? 'Complete' : 'Incomplete'}
                     </span>
-                    
-                    {task.priority && (
-                      <span 
-                        className={`text-xs px-2 py-1 rounded flex items-center ${getPriorityClasses(task.priority)}`}
-                        aria-label={`Priority: ${task.priority}`}
-                      >
-                        <FaFlag className="mr-1" aria-hidden="true" />
-                        {task.priority}
+
+                          {task.priority && (
+                              <span
+                                  className={`text-xs px-2 py-1 rounded flex items-center ${getPriorityClasses(task.priority)}`}
+                                  aria-label={`Priority: ${task.priority}`}
+                              >
+                        <FaFlag className="mr-1" aria-hidden="true"/>
+                                {task.priority}
                       </span>
-                    )}
-                  </div>
-                  
-                  {task.dueDate && (
-                    <span 
-                      className="text-xs text-gray-500 flex items-center"
-                      title={`Due date: ${new Date(task.dueDate).toLocaleString()}`}
-                    >
-                      <FaCalendarAlt className="mr-1" aria-hidden="true" />
-                      {formatDate(task.dueDate)}
+                          )}
+                        </div>
+
+                        {task.dueDate && (
+                            <span
+                                className="text-xs text-gray-500 flex items-center"
+                                title={`Due date: ${new Date(task.dueDate).toLocaleString()}`}
+                            >
+                      <FaCalendarAlt className="mr-1" aria-hidden="true"/>
+                              {formatDate(task.dueDate)}
                     </span>
-                  )}
-                </div>
-              </div>
-            )}
-          </li>
-        ))}
-      </ul>
-    </div>
+                        )}
+                      </div>
+                    </div>
+                )}
+              </li>
+          ))}
+        </ul>
+      </div>
   );
 };
 
