@@ -104,9 +104,9 @@ function App() {
                   <Route
                       path="/"
                       element={
-                          <ProtectedRoute>
+                          // <ProtectedRoute>
                               <Landing />
-                          </ProtectedRoute>
+                          // </ProtectedRoute>
                       }
                   />
                 <Route path="/login" element={<Login />} />
@@ -144,6 +144,14 @@ function App() {
                       <ManageTasks />
                     </ProtectedRoute>
                   } 
+                />
+                <Route
+                  path="/admin/user-logs"
+                  element={
+                     <ProtectedRoute requiredRole="admin">
+                        <UserLogPage />
+                     </ProtectedRoute>
+                  }
                 />
                 <Route 
                   path="/admin/settings" 
